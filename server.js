@@ -9,12 +9,11 @@ const app = express();
 // Seguridad con Helmet (CSP)
 app.use(
   helmet.contentSecurityPolicy({
-    useDefaults: true,
     directives: {
-      "default-src": ["'self'"],
-      "script-src": ["'self'"],
-      "style-src": ["'self'"]
-    },
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'"]
+    }
   })
 );
 
