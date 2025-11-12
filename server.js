@@ -6,15 +6,15 @@ require('dotenv').config();
 
 const app = express();
 
-// Seguridad con Helmet
+// Seguridad con Helmet (CSP)
 app.use(
   helmet.contentSecurityPolicy({
     useDefaults: true,
     directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'"]
-    }
+      "default-src": ["'self'"],
+      "script-src": ["'self'"],
+      "style-src": ["'self'"]
+    },
   })
 );
 
@@ -22,7 +22,13 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Rutas
+// Servir archivos estáticos y vista principal
+app.use('/public', express.static(process.cwd() + '/public'));
+app.route('/').get(function (req, res) {
+  res.sendFile(process.cwd() + '/views/index.html');
+});
+
+// Rutas de la API
 require('./routes/api.js')(app);
 
 // Inicio del servidor
