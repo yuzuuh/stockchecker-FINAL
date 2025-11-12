@@ -1,33 +1,37 @@
-// server.js
+'use strict';
 const express = require('express');
+const cors = require('cors');
 const helmet = require('helmet');
-const csp = helmet.contentSecurityPolicy;
+require('dotenv').config();
 
 const app = express();
-
-// Seguridad con Helmet v5
-app.use(helmet());
 app.use(
-  csp({
+  helmet.contentSecurityPolicy({
     directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'"],
-      imgSrc: ["'self'"],
-    },
+      "default-src": ["'self'"],
+      "script-src": ["'self'"],
+      "style-src": ["'self'"]
+    }
   })
 );
 
-app.use(express.static('public'));
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Importar rutas de API
-const apiRoutes = require('./routes/api');
-app.use('/api/stock-prices', apiRoutes);
+// Servir archivos estáticos y vista principal
+app.use('/public', express.static(process.cwd() + '/public'));
+app.route('/').get(function (req, res) {
+  res.sendFile(process.cwd() + '/views/index.html');
+});
 
-// Puerto para Render
+// Rutas de la API
+require('./routes/api.js')(app);
+
+// Inicio del servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor escuchando en puerto ${PORT}`);
+  console.log(`Servidor corriendo en puerto ${PORT}`);
 });
 
 module.exports = app;
