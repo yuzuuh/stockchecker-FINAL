@@ -1,4 +1,4 @@
-document.getElementById('testForm2').addEventListener('submit', e => {
+document.getElementById('testForm').addEventListener('submit', e => {
   e.preventDefault();
   const stock = e.target[0].value;
   const checkbox = e.target[1].checked;
@@ -9,7 +9,7 @@ document.getElementById('testForm2').addEventListener('submit', e => {
     });
 });
 
-document.getElementById('testForm').addEventListener('submit', e => {
+document.getElementById('testForm2').addEventListener('submit', e => {
   e.preventDefault();
   const stock1 = e.target[0].value;
   const stock2 = e.target[1].value;
