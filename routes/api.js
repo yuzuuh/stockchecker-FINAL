@@ -1,20 +1,25 @@
 'use strict';
 const StockHandler = require('../controllers/stockHandler.js');
-const fetch = require('node-fetch');
 
 module.exports = function (app) {
   const stockHandler = new StockHandler();
 
   app.route('/api/stock-prices')
     .get(async function (req, res) {
-      const { stock, like } = req.query;
-
       try {
-        if (Array.isArray(stock)) {
-          // Si hay dos stocks
+        let { stock, like } = req.query;
+        if (!stock) return res.status(400).json({ error: 'Missing stock symbol' });
+
+        // Asegura que 'stock' sea siempre un array
+        const stocks = Array.isArray(stock) ? stock : [stock];
+
+        if (stocks.length === 1) {
+          const data = await stockHandler.getStock(stocks[0], like, req.ip);
+          return res.json({ stockData: data });
+        } else {
           const [data1, data2] = await Promise.all([
-            stockHandler.getStock(stock[0], like, req.ip),
-            stockHandler.getStock(stock[1], like, req.ip)
+            stockHandler.getStock(stocks[0], like, req.ip),
+            stockHandler.getStock(stocks[1], like, req.ip)
           ]);
 
           const rel_likes_1 = data1.likes - data2.likes;
@@ -26,10 +31,6 @@ module.exports = function (app) {
               { stock: data2.stock, price: data2.price, rel_likes: rel_likes_2 }
             ]
           });
-        } else {
-          // Solo un stock
-          const data = await stockHandler.getStock(stock, like, req.ip);
-          return res.json({ stockData: data });
         }
       } catch (error) {
         console.error(error);
