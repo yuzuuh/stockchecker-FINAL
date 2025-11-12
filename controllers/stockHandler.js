@@ -1,7 +1,7 @@
 'use strict';
 const fetch = require('node-fetch');
 
-let likesDB = {}; // almacenamiento temporal (FCC no exige base real)
+const likesDB = {}; // persistencia en memoria
 
 function normalizeStock(symbol) {
   return symbol.toUpperCase();
@@ -17,22 +17,23 @@ class StockHandler {
       throw new Error(`No se encontró el precio para ${stock}`);
     }
 
-    // Inicializa si no existe
+    // Inicializar si no existe
     if (!likesDB[stock]) {
-      likesDB[stock] = { likes: new Set() };
+      likesDB[stock] = new Set();
     }
 
-    // Manejar el "like"
-    if (like === 'true') {
-      likesDB[stock].likes.add(ip);
+    // Like por IP
+    if (like === true || like === 'true') {
+      likesDB[stock].add(ip);
     }
 
     return {
-      stock: stock,
+      stock,
       price: data.latestPrice,
-      likes: likesDB[stock].likes.size
+      likes: likesDB[stock].size
     };
   }
 }
 
 module.exports = StockHandler;
+
