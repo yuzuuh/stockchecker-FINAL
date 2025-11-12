@@ -1,27 +1,34 @@
-require('dotenv').config();
+'use strict';
 const express = require('express');
-const helmet = require('helmet');
 const cors = require('cors');
-const path = require('path');
+const helmet = require('helmet');
+require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// seguridad básica
-app.use(helmet());
+// Seguridad con Helmet
+app.use(
+  helmet.contentSecurityPolicy({
+    useDefaults: true,
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'"]
+    }
+  })
+);
+
 app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// servir archivos estáticos
-app.use(express.static(path.join(__dirname, 'public')));
+// Rutas
+require('./routes/api.js')(app);
 
-// ruta principal
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'index.html'));
+// Inicio del servidor
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en puerto ${PORT}`);
 });
 
-// ejemplo de ruta API
-app.get('/api/stock', (req, res) => {
-  res.json({ stock: 'AAPL', price: 189.75 });
-});
-
-app.listen(PORT, () => console.log(`✅ Servidor corriendo en puerto ${PORT}`));
+module.exports = app;
