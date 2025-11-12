@@ -5,14 +5,12 @@ const helmet = require('helmet');
 require('dotenv').config();
 
 const app = express();
-
-// Seguridad con Helmet (CSP)
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'"]
+      "default-src": ["'self'"],
+      "script-src": ["'self'"],
+      "style-src": ["'self'"]
     }
   })
 );
