@@ -6,24 +6,17 @@ require('dotenv').config();
 
 const app = express();
 
-// 🔒 Ocultar X-Powered-By
+// Ocultar X-Powered-By
 app.disable('x-powered-by');
 
-// 🛡 Helmet base
+// Desactivar CSP de helmet (FCC no lo lee bien en Render)
 app.use(
   helmet({
-    contentSecurityPolicy: {
-      useDefaults: false,
-      directives: {
-        "default-src": ["'self'"],
-        "script-src": ["'self'"],
-        "style-src": ["'self'"]
-      },
-    },
+    contentSecurityPolicy: false
   })
 );
 
-// ✅ FCC workaround – fuerza exactamente el header que espera el test
+// Forzar CSP EXACTA para FCC (esta es la clave)
 app.use((req, res, next) => {
   res.setHeader(
     "Content-Security-Policy",
@@ -36,16 +29,17 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 📂 Archivos estáticos
+// Archivos estáticos
 app.use('/public', express.static(process.cwd() + '/public'));
+
 app.route('/').get((req, res) => {
   res.sendFile(process.cwd() + '/views/index.html');
 });
 
-// 🧩 Rutas API
+// API
 require('./routes/api.js')(app);
 
-// 🚀 Iniciar servidor
+// Servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en puerto ${PORT}`);
