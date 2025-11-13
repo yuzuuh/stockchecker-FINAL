@@ -6,35 +6,38 @@ require('dotenv').config();
 
 const app = express();
 
-// ✅ EXACTO formato que FCC valida
+// 🔒 Quitar el header "X-Powered-By" que FCC revisa
+app.disable('x-powered-by');
+
+// 🔐 Configurar Helmet con políticas CSP básicas
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
       "default-src": ["'self'"],
       "script-src": ["'self'"],
       "style-src": ["'self'"]
-    },
-    useDefaults: false // ⚠️ evita agregar otras directivas automáticas
+    }
   })
 );
 
-app.use(cors({ origin: '*' }));
+// 🌐 Habilitar CORS
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ archivos estáticos e index
+// 📂 Servir archivos estáticos y vista principal
 app.use('/public', express.static(process.cwd() + '/public'));
-app.get('/', (req, res) => {
+app.route('/').get(function (req, res) {
   res.sendFile(process.cwd() + '/views/index.html');
 });
 
-// ✅ rutas API
+// 🧩 Rutas de la API
 require('./routes/api.js')(app);
 
-// ✅ iniciar servidor
+// 🚀 Iniciar servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en el puerto ${PORT}`);
+  console.log(`Servidor corriendo en puerto ${PORT}`);
 });
 
 module.exports = app;
