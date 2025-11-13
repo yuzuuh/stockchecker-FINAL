@@ -6,25 +6,21 @@ require('dotenv').config();
 
 const app = express();
 
-// Ocultar X-Powered-By
-app.disable('x-powered-by');
-
-// Desactivar CSP de helmet (FCC no lo lee bien en Render)
+// 🔒 CSP EXACTA QUE FCC ESPERA
 app.use(
-  helmet({
-    contentSecurityPolicy: false
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'"]
+    }
   })
 );
 
-// Forzar CSP EXACTA para FCC (esta es la clave)
-app.use((req, res, next) => {
-  res.setHeader(
-    "Content-Security-Policy",
-    "default-src 'self'; script-src 'self'; style-src 'self'"
-  );
-  next();
-});
+// 🔒 OCULTAR X-POWERED-BY
+app.disable('x-powered-by');
 
+// Middleware estándar
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -32,11 +28,12 @@ app.use(express.urlencoded({ extended: true }));
 // Archivos estáticos
 app.use('/public', express.static(process.cwd() + '/public'));
 
-app.route('/').get((req, res) => {
+// Vista principal
+app.route('/').get(function (req, res) {
   res.sendFile(process.cwd() + '/views/index.html');
 });
 
-// API
+// Rutas API
 require('./routes/api.js')(app);
 
 // Servidor
