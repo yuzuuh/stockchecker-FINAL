@@ -6,19 +6,19 @@ require('dotenv').config();
 
 const app = express();
 
-// 🔒 Configuración Helmet según FCC
-app.use(helmet.hidePoweredBy()); // ✅ Consigna 2
-app.use(helmet.frameguard({ action: 'deny' })); // Consigna 3
-app.use(helmet.xssFilter()); // Consigna 4
-app.use(helmet.noSniff()); // Consigna 5
-app.use(helmet.ieNoOpen()); // Consigna 6
+// 🔒 Helmet (versión 5.x compatible con FCC)
+app.use(helmet.hidePoweredBy());
+app.use(helmet.frameguard({ action: 'deny' }));
+app.use(helmet.xssFilter());
+app.use(helmet.noSniff());
+app.use(helmet.ieNoOpen());
 app.use(
-  helmet.contentSecurityPolicy({ // ✅ Consigna 7
+  helmet.contentSecurityPolicy({
     directives: {
-      "default-src": ["'self'"],
-      "script-src": ["'self'"],
-      "style-src": ["'self'"]
-    }
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'"]
+    },
   })
 );
 
@@ -26,16 +26,13 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Servir archivos estáticos y vista principal
 app.use('/public', express.static(process.cwd() + '/public'));
 app.route('/').get(function (req, res) {
   res.sendFile(process.cwd() + '/views/index.html');
 });
 
-// Rutas de la API
 require('./routes/api.js')(app);
 
-// Inicio del servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en puerto ${PORT}`);
