@@ -7,35 +7,40 @@ require('dotenv').config();
 
 const app = express();
 
-// ✅ Configurar Content Security Policy (CSP) para que solo permita scripts y estilos desde el mismo servidor
+// ✅ Configuración de seguridad: solo permitir scripts y estilos del mismo servidor
 app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'"]
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'"]
+      },
     },
+    crossOriginEmbedderPolicy: false, // evita errores con FCC
   })
 );
 
-// ✅ Middleware de seguridad y utilidades
-app.use(cors());
+// ✅ Middleware básico
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ Servir archivos estáticos y vista principal
+// ✅ Servir archivos estáticos
 app.use('/public', express.static(process.cwd() + '/public'));
-app.route('/').get(function (req, res) {
+
+// ✅ Página principal
+app.get('/', (req, res) => {
   res.sendFile(process.cwd() + '/views/index.html');
 });
 
-// ✅ Rutas de la API (importa tu archivo api.js)
+// ✅ Rutas de la API
 require('./routes/api.js')(app);
 
 // ✅ Iniciar servidor
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, function () {
-  console.log(`Servidor corriendo en puerto ${PORT}`);
+app.listen(PORT, () => {
+  console.log(`Servidor escuchando en el puerto ${PORT}`);
 });
 
 module.exports = app;
