@@ -5,8 +5,15 @@ const helmet = require('helmet');
 require('dotenv').config();
 
 const app = express();
+
+// 🔒 Configuración Helmet según FCC
+app.use(helmet.hidePoweredBy()); // ✅ Consigna 2
+app.use(helmet.frameguard({ action: 'deny' })); // Consigna 3
+app.use(helmet.xssFilter()); // Consigna 4
+app.use(helmet.noSniff()); // Consigna 5
+app.use(helmet.ieNoOpen()); // Consigna 6
 app.use(
-  helmet.contentSecurityPolicy({
+  helmet.contentSecurityPolicy({ // ✅ Consigna 7
     directives: {
       "default-src": ["'self'"],
       "script-src": ["'self'"],
