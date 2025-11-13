@@ -1,5 +1,4 @@
 'use strict';
-
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -7,40 +6,35 @@ require('dotenv').config();
 
 const app = express();
 
-// ✅ Configuración de seguridad: solo permitir scripts y estilos del mismo servidor
+// ✅ EXACTO formato que FCC valida
 app.use(
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'"],
-        styleSrc: ["'self'"]
-      },
+  helmet.contentSecurityPolicy({
+    directives: {
+      "default-src": ["'self'"],
+      "script-src": ["'self'"],
+      "style-src": ["'self'"]
     },
-    crossOriginEmbedderPolicy: false, // evita errores con FCC
+    useDefaults: false // ⚠️ evita agregar otras directivas automáticas
   })
 );
 
-// ✅ Middleware básico
 app.use(cors({ origin: '*' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ Servir archivos estáticos
+// ✅ archivos estáticos e index
 app.use('/public', express.static(process.cwd() + '/public'));
-
-// ✅ Página principal
 app.get('/', (req, res) => {
   res.sendFile(process.cwd() + '/views/index.html');
 });
 
-// ✅ Rutas de la API
+// ✅ rutas API
 require('./routes/api.js')(app);
 
-// ✅ Iniciar servidor
+// ✅ iniciar servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor escuchando en el puerto ${PORT}`);
+  console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
 
 module.exports = app;
